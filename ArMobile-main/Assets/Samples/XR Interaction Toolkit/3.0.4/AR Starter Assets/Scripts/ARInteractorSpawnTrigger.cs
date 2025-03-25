@@ -87,6 +87,15 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.ARStarterAssets
         [SerializeField]
         XRInputButtonReader m_SpawnObjectInput = new XRInputButtonReader("Spawn Object");
 
+        [SerializeField]
+        bool onlySpawnOne = true;
+
+
+        bool alreadySpawned;
+
+
+
+
         /// <summary>
         /// The input used to trigger spawn, if <see cref="spawnTriggerType"/> is set to <see cref="SpawnTriggerType.InputAction"/>.
         /// </summary>
@@ -155,7 +164,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.ARStarterAssets
             // Wait a frame after the Spawn Object input is triggered to actually cast against AR planes and spawn
             // in order to ensure the touchscreen gestures have finished processing to allow the ray pose driver
             // to update the pose based on the touch position of the gestures.
-            if (m_AttemptSpawn)
+            if (m_AttemptSpawn && !alreadySpawned)
             {
                 m_AttemptSpawn = false;
 
@@ -170,6 +179,11 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.ARStarterAssets
                         return;
 
                     m_ObjectSpawner.TrySpawnObject(arRaycastHit.pose.position, arPlane.normal);
+
+                    if (onlySpawnOne)
+                    {
+                        alreadySpawned = true;     
+                    }
                 }
 
                 return;
