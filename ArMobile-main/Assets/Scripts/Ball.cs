@@ -5,12 +5,16 @@ using UnityEngine.InputSystem;
 
 public class Ball : MonoBehaviour
 {
+    public GameObject cam;
     private Vector2 startTouchPosition;
     private Vector2 endTouchPosition;
     private Rigidbody rb;
     private bool isDragging = false;
 
     public float throwForce = 1f;
+    public float distanceFromCamera = 2f; // Distancia adicional desde la cámara
+
+
 
     void Start()
     {
@@ -19,31 +23,19 @@ public class Ball : MonoBehaviour
 
     void Update()
     {
-        if (Touchscreen.current.primaryTouch.press.isPressed || Mouse.current.leftButton.isPressed)
+        if (Input.GetMouseButton(0)) 
         {
-            if (!isDragging)
-            {
-                // Start touch or mouse click
-                startTouchPosition = Touchscreen.current.primaryTouch.press.isPressed
-                    ? Touchscreen.current.primaryTouch.position.ReadValue()
-                    : Mouse.current.position.ReadValue();
-                isDragging = true;
-            }
-            else
-            {
-                // Update touch or mouse drag
-                endTouchPosition = Touchscreen.current.primaryTouch.press.isPressed
-                    ? Touchscreen.current.primaryTouch.position.ReadValue()
-                    : Mouse.current.position.ReadValue();
-                gameObject.transform.position = Camera.main.ScreenToWorldPoint(new Vector3(endTouchPosition.x, endTouchPosition.y, 1));
-                rb.velocity = Vector3.zero;
-            }
+
+            Vector3 mousePosition = Input.mousePosition;
+            mousePosition.z = distanceFromCamera; // Usar la distancia desde la cámara
+            rb.velocity = Vector3.zero;
+            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
+            transform.position = worldPosition;
+
         }
         else if (isDragging)
         {
-            // End touch or mouse release
-            isDragging = false;
-            ThrowBall();
+            // Additional logic for when dragging ends
         }
     }
 
