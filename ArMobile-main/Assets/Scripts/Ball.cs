@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -14,8 +15,6 @@ public class Ball : MonoBehaviour
     public float throwForce = 1f;
     public float distanceFromCamera = 2f; // Distancia adicional desde la cámara
 
-
-
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -23,26 +22,64 @@ public class Ball : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButton(0)) 
+        // Mouse controls
+        if (Input.GetMouseButtonDown(0))
         {
+            startTouchPosition = Input.mousePosition;
+        }
 
+        if (Input.GetMouseButton(0))
+        {
             Vector3 mousePosition = Input.mousePosition;
             mousePosition.z = distanceFromCamera; // Usar la distancia desde la cámara
             rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
             transform.position = worldPosition;
-
         }
-        else if (isDragging)
+
+        if (Input.GetMouseButtonUp(0))
         {
-            // Additional logic for when dragging ends
+            endTouchPosition = Input.mousePosition;
+            ThrowBall();
+        }
+
+        // Touch controls
+        if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+
+            if (touch.phase == UnityEngine.TouchPhase.Began)
+            {
+                startTouchPosition = touch.position;
+            }
+
+            if (touch.phase == UnityEngine.TouchPhase.Moved || touch.phase == UnityEngine.TouchPhase.Stationary)
+            {
+                Vector3 touchPosition = touch.position;
+                touchPosition.z = distanceFromCamera; // Usar la distancia desde la cámara
+                rb.velocity = Vector3.zero;
+                rb.angularVelocity = Vector3.zero;
+                Vector3 worldPosition = Camera.main.ScreenToWorldPoint(touchPosition);
+                transform.position = worldPosition;
+            }
+
+            if (touch.phase == UnityEngine.TouchPhase.Ended)
+            {
+                endTouchPosition = touch.position;
+                ThrowBall();
+            }
         }
     }
 
     void ThrowBall()
     {
-        Vector2 direction = endTouchPosition - startTouchPosition;
-        Vector3 throwDirection = new Vector3(direction.x, 1, 1).normalized;
-        rb.AddForce(throwDirection * throwForce, ForceMode.Impulse);
+        float force = endTouchPosition.y - startTouchPosition.y;
+        Debug.Log("Force: " + force);
+        float distance = force;
+        float adjustedThrowForce = throwForce * distance;
+
+        Vector3 throwDirection = (Camera.main.transform.forward).normalized;
+        rb.AddForce((throwDirection * adjustedThrowForce) + new Vector3(0, adjustedThrowForce, 0), ForceMode.Impulse);
     }
 }

@@ -614,7 +614,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a4b44e1c4ce5fa54f870e7d5838a8caa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  throwForce: 10
+  cam: {fileID: 331264287}
+  throwForce: 0.01
+  distanceFromCamera: 1
 --- !u!54 &182679389
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1369,6 +1371,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6803edce0201f574f923fd9d10e5b30a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &331264287 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2512387469002778309, guid: 48cb3fb68c91eb94999fd99957eb0cae,
+    type: 3}
+  m_PrefabInstance: {fileID: 331264285}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &332374253
 GameObject:
   m_ObjectHideFlags: 0
