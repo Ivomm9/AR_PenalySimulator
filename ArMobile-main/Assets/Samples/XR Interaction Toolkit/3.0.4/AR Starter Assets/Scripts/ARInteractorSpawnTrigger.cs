@@ -182,7 +182,10 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.ARStarterAssets
 
                     if (onlySpawnOne)
                     {
-                        alreadySpawned = true;     
+                        alreadySpawned = true;  
+                        arRaycastHit.trackable.gameObject.SetActive(false);
+                        m_ARInteractor.gameObject.SetActive(false);
+                        Debug.Log("Object Spawned");
                     }
                 }
 
