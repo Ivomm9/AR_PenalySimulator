@@ -11,6 +11,8 @@ public class Ball : MonoBehaviour
     private Vector2 endTouchPosition;
     private Rigidbody rb;
     private bool isDragging = false;
+    private bool grabbedBall = false;
+    private bool isGrounded = false;
 
     public float throwForce = 1f;
     public float distanceFromCamera = 2f; // Distancia adicional desde la cámara
@@ -18,14 +20,42 @@ public class Ball : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        GameManager.Instance.onGameRestart.AddListener(ResetBall);
     }
 
     void Update()
     {
-        // Mouse controls
+        if (GameManager.Instance.gameStarted == false)
+        {
+            return;
+        }
+
+        if (rb.velocity.magnitude < 0.1f && grabbedBall == false && isDragging == true && isGrounded == true)
+        {
+            Debug.Log("Ball Slow");
+            GameManager.Instance.Restart();
+        }
+
+        if (isDragging == false)
+        {
+            transform.position = cam.transform.position + cam.transform.forward * distanceFromCamera;
+            rb.velocity = Vector3.zero;
+            rb.angularVelocity = Vector3.zero;
+        }
+
+        if (GameManager.Instance.isGamePaused) 
+        {
+            return;
+        }
+
+        
+
+
         if (Input.GetMouseButtonDown(0))
         {
+            grabbedBall = true;
             startTouchPosition = Input.mousePosition;
+            isDragging = true;
         }
 
         if (Input.GetMouseButton(0))
@@ -40,6 +70,7 @@ public class Ball : MonoBehaviour
 
         if (Input.GetMouseButtonUp(0))
         {
+         
             endTouchPosition = Input.mousePosition;
             ThrowBall();
         }
@@ -70,6 +101,7 @@ public class Ball : MonoBehaviour
                 ThrowBall();
             }
         }
+
     }
 
     void ThrowBall()
@@ -79,7 +111,49 @@ public class Ball : MonoBehaviour
         float distance = force;
         float adjustedThrowForce = throwForce * distance;
 
+        GameManager.Instance.AddThrows(1);
         Vector3 throwDirection = (Camera.main.transform.forward).normalized;
         rb.AddForce((throwDirection * adjustedThrowForce) + new Vector3(0, adjustedThrowForce, 0), ForceMode.Impulse);
+        grabbedBall = false;
     }
+
+    void ResetBall()
+    {
+        isDragging = false;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Reseter"))
+        {
+            GameManager.Instance.Restart();
+        }
+        if (other.CompareTag("Goal"))
+        {
+            GameManager.Instance.AddScore(1);
+            GameManager.Instance.Restart();
+        }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Floor"))
+        {
+            isGrounded = true;
+        }
+
+        if (collision.gameObject.CompareTag("Goalee") || collision.gameObject.CompareTag("Defense"))
+        {
+            GameManager.Instance.Restart();
+        }
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        if (collision.gameObject.CompareTag("Floor"))
+        {
+            isGrounded = false;
+        }
+    }
+
 }

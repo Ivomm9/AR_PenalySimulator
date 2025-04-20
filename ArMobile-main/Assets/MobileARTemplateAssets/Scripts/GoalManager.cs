@@ -295,19 +295,19 @@ public class GoalManager : MonoBehaviour
         var scaleHintsGoal = new Goal(OnboardingGoals.Scale);
         var rotateHintsGoal = new Goal(OnboardingGoals.Hints);
 
-        m_OnboardingGoals.Enqueue(tapSurfaceGoal);
-        m_OnboardingGoals.Enqueue(translateHintsGoal);
-        m_OnboardingGoals.Enqueue(scaleHintsGoal);
-        m_OnboardingGoals.Enqueue(rotateHintsGoal);
+        //m_OnboardingGoals.Enqueue(tapSurfaceGoal);
+        //m_OnboardingGoals.Enqueue(translateHintsGoal);
+        //m_OnboardingGoals.Enqueue(scaleHintsGoal);
+        //m_OnboardingGoals.Enqueue(rotateHintsGoal);
 
         m_CurrentGoal = m_OnboardingGoals.Dequeue();
-        m_AllGoalsFinished = false;
+        m_AllGoalsFinished = true;
         m_CurrentGoalIndex = startingStep;
 
         m_GreetingPrompt.SetActive(false);
-        m_OptionsButton.SetActive(true);
-        m_CreateButton.SetActive(true);
-        m_MenuManager.enabled = true;
+        //m_OptionsButton.SetActive(true);
+        //m_CreateButton.SetActive(true);
+        //m_MenuManager.enabled = true;
 
         for (int i = startingStep; i < m_StepList.Count; i++)
         {

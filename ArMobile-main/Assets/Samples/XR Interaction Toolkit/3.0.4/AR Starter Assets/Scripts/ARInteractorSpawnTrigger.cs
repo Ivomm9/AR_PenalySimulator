@@ -34,6 +34,8 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.ARStarterAssets
         [Tooltip("The AR ray interactor that determines where to spawn the object.")]
         XRRayInteractor m_ARInteractor;
 
+        [SerializeField]
+        GameObject xrOrigin;
         /// <summary>
         /// The AR ray interactor that determines where to spawn the object.
         /// </summary>
@@ -185,6 +187,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.ARStarterAssets
                         alreadySpawned = true;  
                         arRaycastHit.trackable.gameObject.SetActive(false);
                         m_ARInteractor.gameObject.SetActive(false);
+                        xrOrigin.GetComponent<ARPlaneManager>().enabled = false;
                         Debug.Log("Object Spawned");
                     }
                 }

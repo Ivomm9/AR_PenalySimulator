@@ -192,17 +192,17 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
         /// <seealso cref="objectSpawned"/>
         public bool TrySpawnObject(Vector3 spawnPoint, Vector3 spawnNormal)
         {
-            if (m_OnlySpawnInView)
-            {
-                var inViewMin = m_ViewportPeriphery;
-                var inViewMax = 1f - m_ViewportPeriphery;
-                var pointInViewportSpace = cameraToFace.WorldToViewportPoint(spawnPoint);
-                if (pointInViewportSpace.z < 0f || pointInViewportSpace.x > inViewMax || pointInViewportSpace.x < inViewMin ||
-                    pointInViewportSpace.y > inViewMax || pointInViewportSpace.y < inViewMin)
-                {
-                    return false;
-                }
-            }
+            //if (m_OnlySpawnInView)
+            //{
+            //    var inViewMin = m_ViewportPeriphery;
+            //    var inViewMax = 1f - m_ViewportPeriphery;
+            //    var pointInViewportSpace = cameraToFace.WorldToViewportPoint(spawnPoint);
+            //    if (pointInViewportSpace.z < 0f || pointInViewportSpace.x > inViewMax || pointInViewportSpace.x < inViewMin ||
+            //        pointInViewportSpace.y > inViewMax || pointInViewportSpace.y < inViewMin)
+            //    {
+            //        return false;
+            //    }
+            //}
 
             var objectIndex = isSpawnOptionRandomized ? Random.Range(0, m_ObjectPrefabs.Count) : m_SpawnOptionIndex;
             var newObject = Instantiate(m_ObjectPrefabs[objectIndex]);
@@ -225,6 +225,7 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.StarterAssets
 
             if (m_SpawnVisualizationPrefab != null)
             {
+                Debug.Log("hgoal spawned");
                 var visualizationTrans = Instantiate(m_SpawnVisualizationPrefab).transform;
                 visualizationTrans.position = spawnPoint;
                 visualizationTrans.rotation = newObject.transform.rotation;
