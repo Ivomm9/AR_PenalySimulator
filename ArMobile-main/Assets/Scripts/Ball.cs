@@ -17,6 +17,11 @@ public class Ball : MonoBehaviour
     public float throwForce = 1f;
     public float distanceFromCamera = 2f; // Distancia adicional desde la cámara
 
+    // Variables para detectar el giro y aplicar efecto Magnus:
+    private float spinDirection = 0f;
+    private List<Vector2> dragPositions = new List<Vector2>();
+    public float magnusFactor = 0.01f; // Ajustá este valor para controlar la intensidad de la curva
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -26,9 +31,7 @@ public class Ball : MonoBehaviour
     void Update()
     {
         if (GameManager.Instance.gameStarted == false)
-        {
             return;
-        }
 
         if (rb.velocity.magnitude < 0.1f && grabbedBall == false && isDragging == true && isGrounded == true)
         {
@@ -43,36 +46,44 @@ public class Ball : MonoBehaviour
             rb.angularVelocity = Vector3.zero;
         }
 
-        if (GameManager.Instance.isGamePaused) 
-        {
+        if (GameManager.Instance.isGamePaused)
             return;
-        }
 
+        // ----------------------
+        // Control del ratón (Mouse)
+        // ----------------------
         if (Input.GetMouseButtonDown(0))
         {
             grabbedBall = true;
             startTouchPosition = Input.mousePosition;
             isDragging = true;
+            dragPositions.Clear();
+            dragPositions.Add(Input.mousePosition);
         }
 
         if (Input.GetMouseButton(0))
         {
             Vector3 mousePosition = Input.mousePosition;
-            mousePosition.z = distanceFromCamera; // Usar la distancia desde la cámara
+            mousePosition.z = distanceFromCamera; // Mantiene la distancia desde la cámara
             rb.velocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
             transform.position = worldPosition;
+
+            // Registro de posiciones para calcular el giro
+            dragPositions.Add(Input.mousePosition);
         }
 
         if (Input.GetMouseButtonUp(0))
         {
-         
             endTouchPosition = Input.mousePosition;
-            ThrowBall();
+            CalculateSpin();  // Calcula la curvatura del swipe y asigna spinDirection
+            ThrowBall();      // Lanza la pelota aplicando fuerza y giro
         }
 
-        // Touch controls
+        // ----------------------
+        // Control táctil (Touch)
+        // ----------------------
         if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
@@ -80,38 +91,108 @@ public class Ball : MonoBehaviour
             if (touch.phase == UnityEngine.TouchPhase.Began)
             {
                 startTouchPosition = touch.position;
+                isDragging = true;
+                dragPositions.Clear();
+                dragPositions.Add(touch.position);
             }
 
             if (touch.phase == UnityEngine.TouchPhase.Moved || touch.phase == UnityEngine.TouchPhase.Stationary)
             {
                 Vector3 touchPosition = touch.position;
-                touchPosition.z = distanceFromCamera; // Usar la distancia desde la cámara
+                touchPosition.z = distanceFromCamera; // Mantiene la distancia desde la cámara
                 rb.velocity = Vector3.zero;
                 rb.angularVelocity = Vector3.zero;
                 Vector3 worldPosition = Camera.main.ScreenToWorldPoint(touchPosition);
                 transform.position = worldPosition;
+
+                // Registro de posiciones para calcular el giro
+                dragPositions.Add(touch.position);
             }
 
             if (touch.phase == UnityEngine.TouchPhase.Ended)
             {
                 endTouchPosition = touch.position;
+                CalculateSpin();
                 ThrowBall();
             }
         }
-
     }
 
+    void FixedUpdate()
+    {
+        // Mientras la pelota está en el aire, si tiene velocidad y giro, aplicamos efecto Magnus
+        if (rb.velocity.magnitude > 0.1f && rb.angularVelocity.magnitude > 0.1f)
+        {
+            ApplyMagnusEffect();
+        }
+    }
+
+    // Aplica la fuerza lateral (efecto Magnus) a partir del giro y la velocidad
+    void ApplyMagnusEffect()
+    {
+        Vector3 spin = rb.angularVelocity;
+        Vector3 magnusForce = Vector3.Cross(spin, rb.velocity) * magnusFactor;
+        rb.AddForce(magnusForce, ForceMode.Force);
+    }
+
+    // Calcula la curvatura del swipe a partir de las posiciones registradas
+    void CalculateSpin()
+    {
+        if (dragPositions.Count < 5)
+        {
+            spinDirection = 0f;
+            return;
+        }
+
+        float curvature = 0f;
+        for (int i = 2; i < dragPositions.Count; i++)
+        {
+            Vector2 a = dragPositions[i - 2];
+            Vector2 b = dragPositions[i - 1];
+            Vector2 c = dragPositions[i];
+
+            Vector2 ab = (b - a).normalized;
+            Vector2 bc = (c - b).normalized;
+
+            float angle = Vector2.SignedAngle(ab, bc);
+            curvature += angle;
+        }
+
+        // Si la curvatura acumulada supera el umbral, se considera un tiro curvo
+        if (Mathf.Abs(curvature) > 60f)
+        {
+            spinDirection = Mathf.Sign(curvature);
+            Debug.Log("Curva detectada: " + (spinDirection > 0 ? "Derecha" : "Izquierda"));
+        }
+        else
+        {
+            spinDirection = 0f;
+            Debug.Log("Tiro recto");
+        }
+        dragPositions.Clear();
+    }
+
+    // Lanza la pelota aplicando fuerza y, si hay giro, asigna angular velocity
     void ThrowBall()
     {
         float force = endTouchPosition.y - startTouchPosition.y;
-        Debug.Log("Force: " + force);
-        float distance = force;
-        float adjustedThrowForce = throwForce * distance;
+        float adjustedThrowForce = throwForce * force;
 
         GameManager.Instance.AddThrows(1);
-        Vector3 throwDirection = (Camera.main.transform.forward).normalized;
-        rb.AddForce((throwDirection * adjustedThrowForce) + new Vector3(0, adjustedThrowForce, 0), ForceMode.Impulse);
+
+        Vector3 forward = Camera.main.transform.forward.normalized;
+        Vector3 totalForce = (forward * adjustedThrowForce) + new Vector3(0, adjustedThrowForce, 0);
+
+        rb.AddForce(totalForce, ForceMode.Impulse);
+
+
+        if (spinDirection != 0f)
+        {
+            rb.angularVelocity = Vector3.up * spinDirection * 20f; 
+        }
+
         grabbedBall = false;
+        spinDirection = 0f;
     }
 
     void ResetBall()
@@ -152,5 +233,4 @@ public class Ball : MonoBehaviour
             isGrounded = false;
         }
     }
-
 }
