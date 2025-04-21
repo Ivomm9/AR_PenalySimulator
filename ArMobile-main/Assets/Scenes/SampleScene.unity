@@ -836,7 +836,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cam: {fileID: 331264287}
-  throwForce: 0.004
+  wasCurveShot: 0
+  throwForce: 0.0012
   distanceFromCamera: 0.5
   magnusFactor: -0.015
 --- !u!54 &182679389
@@ -2187,6 +2188,11 @@ PrefabInstance:
       propertyPath: m_fontStyle
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 791397012947982618, guid: 063cc896506b947c7b2c2ae3beb5868f,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -26.86
+      objectReference: {fileID: 0}
     - target: {fileID: 1579366325745436317, guid: 063cc896506b947c7b2c2ae3beb5868f,
         type: 3}
       propertyPath: m_Name
@@ -2241,8 +2247,8 @@ PrefabInstance:
     - target: {fileID: 5779608150239002450, guid: 063cc896506b947c7b2c2ae3beb5868f,
         type: 3}
       propertyPath: m_text
-      value: "Welcome to penalty AR Simulator. \nHold the screen to make the ball
-        appear \nand swipe up and release to throw it"
+      value: "Welcome to Mesi AR Simulator. \nSwipe up and release the ball to throw
+        it.\nMove around and find the best angle \nto score a goal."
       objectReference: {fileID: 0}
     - target: {fileID: 5865099264268480235, guid: 063cc896506b947c7b2c2ae3beb5868f,
         type: 3}

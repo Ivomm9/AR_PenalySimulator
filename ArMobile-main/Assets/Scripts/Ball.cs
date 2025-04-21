@@ -51,33 +51,33 @@ public class Ball : MonoBehaviour
         if (GameManager.Instance.isGamePaused)
             return;
 
-        if (Input.GetMouseButtonDown(0))
-        {
-            grabbedBall = true;
-            startTouchPosition = Input.mousePosition;
-            isDragging = true;
-            dragPositions.Clear();
-            dragPositions.Add(Input.mousePosition);
-        }
-
-        if (Input.GetMouseButton(0))
-        {
-            Vector3 mousePosition = Input.mousePosition;
-            mousePosition.z = distanceFromCamera; 
-            rb.velocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
-            transform.position = worldPosition;
-
-            dragPositions.Add(Input.mousePosition);
-        }
-
-        if (Input.GetMouseButtonUp(0))
-        {
-            endTouchPosition = Input.mousePosition;
-            CalculateSpin();  
-            ThrowBall();      
-        }
+        //if (Input.GetMouseButtonDown(0))
+        //{
+        //    grabbedBall = true;
+        //    startTouchPosition = Input.mousePosition;
+        //    isDragging = true;
+        //    dragPositions.Clear();
+        //    dragPositions.Add(Input.mousePosition);
+        //}
+        //
+        //if (Input.GetMouseButton(0))
+        //{
+        //    Vector3 mousePosition = Input.mousePosition;
+        //    mousePosition.z = distanceFromCamera; 
+        //    rb.velocity = Vector3.zero;
+        //    rb.angularVelocity = Vector3.zero;
+        //    Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
+        //    transform.position = worldPosition;
+        //
+        //    dragPositions.Add(Input.mousePosition);
+        //}
+        //
+        //if (Input.GetMouseButtonUp(0))
+        //{
+        //    endTouchPosition = Input.mousePosition;
+        //    CalculateSpin();  
+        //    ThrowBall();      
+        //}
 
         if (Input.touchCount > 0)
         {
@@ -150,11 +150,11 @@ public class Ball : MonoBehaviour
             Vector2 bc = (c - b).normalized;
 
             float angle = Vector2.SignedAngle(ab, bc);
-            curvature += angle;
+            curvature += angle * 1.5f;
         }
 
   
-        if (Mathf.Abs(curvature) > 60f)
+        if (Mathf.Abs(curvature) > 600)
         {
             spinDirection = Mathf.Sign(curvature);
             wasCurveShot = true;

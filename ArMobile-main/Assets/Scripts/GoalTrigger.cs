@@ -18,13 +18,14 @@ public class GoalTrigger : MonoBehaviour
                 if (ballScript.wasCurveShot)
                 {
                     Debug.Log("¡Gol con curva!");
-                    curveShotAudio.Play(); 
+                    curveShotAudio.Play();
+
                 }
                 else
                 {
                     Debug.Log("Gol normal");
                 }
-
+               
                 goalParticleSystem.Play();
             }
         }

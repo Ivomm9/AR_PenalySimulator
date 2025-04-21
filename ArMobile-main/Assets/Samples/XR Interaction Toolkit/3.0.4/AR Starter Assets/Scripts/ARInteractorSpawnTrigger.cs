@@ -187,8 +187,20 @@ namespace UnityEngine.XR.Interaction.Toolkit.Samples.ARStarterAssets
                         alreadySpawned = true;  
                         arRaycastHit.trackable.gameObject.SetActive(false);
                         m_ARInteractor.gameObject.SetActive(false);
-                        xrOrigin.GetComponent<ARPlaneManager>().enabled = false;
+                       
                         Debug.Log("Object Spawned");
+
+                        var planeManager = xrOrigin.GetComponent<ARPlaneManager>();
+                        if (planeManager != null)
+                        {
+                            foreach (var trackable in planeManager.trackables)
+                            {
+                                Destroy(trackable.gameObject);
+                            }
+                            Debug.Log("All trackable objects have been deleted.");
+                        }
+
+                        xrOrigin.GetComponent<ARPlaneManager>().enabled = false;
                     }
                 }
 
