@@ -5,6 +5,7 @@ using UnityEngine;
 public class GoalTrigger : MonoBehaviour
 {
     [SerializeField] ParticleSystem goalParticleSystem;
+    [SerializeField] AudioSource curveShotAudio;
 
     void OnTriggerEnter(Collider other)
     {
@@ -17,7 +18,7 @@ public class GoalTrigger : MonoBehaviour
                 if (ballScript.wasCurveShot)
                 {
                     Debug.Log("¡Gol con curva!");
-                    // Acá podés poner efectos o lógica diferente si querés
+                    curveShotAudio.Play(); 
                 }
                 else
                 {
