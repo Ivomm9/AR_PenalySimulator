@@ -45,7 +45,6 @@ public class GameManager : MonoBehaviour
     public void Restart() 
     {
         onGameRestart?.Invoke();
-        Debug.Log("Game Restarted");
     }
 
     public void UpdateThrowsText()

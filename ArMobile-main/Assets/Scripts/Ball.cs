@@ -48,9 +48,6 @@ public class Ball : MonoBehaviour
             return;
         }
 
-        
-
-
         if (Input.GetMouseButtonDown(0))
         {
             grabbedBall = true;
@@ -128,7 +125,7 @@ public class Ball : MonoBehaviour
         {
             GameManager.Instance.Restart();
         }
-        if (other.CompareTag("Goal"))
+        if (other.CompareTag("Goal") && !GameManager.Instance.isGamePaused)
         {
             GameManager.Instance.AddScore(1);
             GameManager.Instance.Restart();
