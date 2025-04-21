@@ -10,7 +10,22 @@ public class GoalTrigger : MonoBehaviour
     {
         if (other.CompareTag("Ball"))
         {
-            goalParticleSystem.Play();
+            Ball ballScript = other.GetComponent<Ball>();
+
+            if (ballScript != null)
+            {
+                if (ballScript.wasCurveShot)
+                {
+                    Debug.Log("¡Gol con curva!");
+                    // Acá podés poner efectos o lógica diferente si querés
+                }
+                else
+                {
+                    Debug.Log("Gol normal");
+                }
+
+                goalParticleSystem.Play();
+            }
         }
     }
 }

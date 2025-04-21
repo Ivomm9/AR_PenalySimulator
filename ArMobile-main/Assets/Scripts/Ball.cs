@@ -13,14 +13,16 @@ public class Ball : MonoBehaviour
     private bool isDragging = false;
     private bool grabbedBall = false;
     private bool isGrounded = false;
+    [HideInInspector]
+    public bool wasCurveShot = false;
 
     public float throwForce = 1f;
-    public float distanceFromCamera = 2f; // Distancia adicional desde la cámara
+    public float distanceFromCamera = 2f; 
 
-    // Variables para detectar el giro y aplicar efecto Magnus:
+
     private float spinDirection = 0f;
     private List<Vector2> dragPositions = new List<Vector2>();
-    public float magnusFactor = 0.01f; // Ajustá este valor para controlar la intensidad de la curva
+    public float magnusFactor = 0.01f; 
 
     void Start()
     {
@@ -49,9 +51,6 @@ public class Ball : MonoBehaviour
         if (GameManager.Instance.isGamePaused)
             return;
 
-        // ----------------------
-        // Control del ratón (Mouse)
-        // ----------------------
         if (Input.GetMouseButtonDown(0))
         {
             grabbedBall = true;
@@ -64,26 +63,22 @@ public class Ball : MonoBehaviour
         if (Input.GetMouseButton(0))
         {
             Vector3 mousePosition = Input.mousePosition;
-            mousePosition.z = distanceFromCamera; // Mantiene la distancia desde la cámara
+            mousePosition.z = distanceFromCamera; 
             rb.velocity = Vector3.zero;
             rb.angularVelocity = Vector3.zero;
             Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePosition);
             transform.position = worldPosition;
 
-            // Registro de posiciones para calcular el giro
             dragPositions.Add(Input.mousePosition);
         }
 
         if (Input.GetMouseButtonUp(0))
         {
             endTouchPosition = Input.mousePosition;
-            CalculateSpin();  // Calcula la curvatura del swipe y asigna spinDirection
-            ThrowBall();      // Lanza la pelota aplicando fuerza y giro
+            CalculateSpin();  
+            ThrowBall();      
         }
 
-        // ----------------------
-        // Control táctil (Touch)
-        // ----------------------
         if (Input.touchCount > 0)
         {
             Touch touch = Input.GetTouch(0);
@@ -105,7 +100,7 @@ public class Ball : MonoBehaviour
                 Vector3 worldPosition = Camera.main.ScreenToWorldPoint(touchPosition);
                 transform.position = worldPosition;
 
-                // Registro de posiciones para calcular el giro
+    
                 dragPositions.Add(touch.position);
             }
 
@@ -120,14 +115,14 @@ public class Ball : MonoBehaviour
 
     void FixedUpdate()
     {
-        // Mientras la pelota está en el aire, si tiene velocidad y giro, aplicamos efecto Magnus
+        
         if (rb.velocity.magnitude > 0.1f && rb.angularVelocity.magnitude > 0.1f)
         {
             ApplyMagnusEffect();
         }
     }
 
-    // Aplica la fuerza lateral (efecto Magnus) a partir del giro y la velocidad
+
     void ApplyMagnusEffect()
     {
         Vector3 spin = rb.angularVelocity;
@@ -135,7 +130,7 @@ public class Ball : MonoBehaviour
         rb.AddForce(magnusForce, ForceMode.Force);
     }
 
-    // Calcula la curvatura del swipe a partir de las posiciones registradas
+ 
     void CalculateSpin()
     {
         if (dragPositions.Count < 5)
@@ -158,21 +153,21 @@ public class Ball : MonoBehaviour
             curvature += angle;
         }
 
-        // Si la curvatura acumulada supera el umbral, se considera un tiro curvo
+  
         if (Mathf.Abs(curvature) > 60f)
         {
             spinDirection = Mathf.Sign(curvature);
-            Debug.Log("Curva detectada: " + (spinDirection > 0 ? "Derecha" : "Izquierda"));
+            wasCurveShot = true;
         }
         else
         {
             spinDirection = 0f;
-            Debug.Log("Tiro recto");
+            wasCurveShot = false;
         }
         dragPositions.Clear();
     }
 
-    // Lanza la pelota aplicando fuerza y, si hay giro, asigna angular velocity
+
     void ThrowBall()
     {
         float force = endTouchPosition.y - startTouchPosition.y;
